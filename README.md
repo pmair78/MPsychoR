@@ -1,2 +1,2 @@
 # MPsychoR
-Supplementary R code for "Modern Psychometrics With R" (Mair, 2018)
+Supplementary R code for Mair, P. (2018). Modern Psychometrics With R. New York, Springer. 
