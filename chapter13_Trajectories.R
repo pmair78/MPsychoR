@@ -204,7 +204,7 @@ cond <- tension$cond                    ## condition
 ftension <- fdata(tension1, argvals = seq(1, 80, length.out = 800), 
                   names = list(main = "Music tension", xlab = "Time (sec)", ylab = "Tension"))
 
-ftensionNP <- min.np(ftension)
+ftensionNP <- optim.np(ftension)
 plot(ftension, main = "Original Data")
 plot(ftensionNP$fdata.est, main = "Smooth Data")
 
@@ -215,7 +215,7 @@ plot(ftension1[7,], main = "Smooth Tension (Person 7)", ylab = "Functional Tensi
 plot(deriv1[7,], main = "", ylab = "Velocity Tension Values")
 par(op)
 
-fsplit <- split.fdata(ftension1, cond)
+fsplit <- split(ftension1, cond)
 Amean <- func.mean(fsplit$Auditory)
 Vmean <- func.mean(fsplit$Visual)
 AVmean <- func.mean(fsplit$AuditoryVisual)
@@ -223,6 +223,7 @@ Amedian <- func.med.FM(fsplit$Auditory)
 Vmedian <- func.med.FM(fsplit$Visual)
 AVmedian <- func.med.FM(fsplit$AuditoryVisual)
 
+dev.new()
 op <- par(mfrow = c(2,1))
 plot(Amean, lwd = 2, main = "Mean Tension Trajectories", ylim = c(-2.5, 2.5))
 lines(Vmean, col = "coral", lwd = 2)
@@ -240,15 +241,15 @@ AVboot <- fdata.bootstrap(fsplit$AuditoryVisual, draw = TRUE)
 title("Bootstrap Mean (Auditory-Visual)")
 
 set.seed(123)
-tension1way <- anova.onefactor(ftension1, cond, nboot = 50)
+tension1way <- fanova.onefactor(ftension1, cond, nboot = 50)
 tension1way$pvalue
 
 fdat <- as.data.frame(ftension1$data)
 gdat <- as.data.frame(cond)
 ctrAudio <- contr.treatment(3)
 set.seed(222)
-fitrpm <- anova.RPm(fdat, ~ cond, gdat, RP = 30, contrast = list(cond = ctrAudio))
-summary.anova(fitrpm)
+fitrpm <- fanova.RPm(fdat, ~ cond, gdat, RP = 30, contrast = list(cond = ctrAudio))
+summary(fitrpm)
 
 library("refund")
 ftension2 <- fdata2fd(ftension1)
@@ -270,7 +271,6 @@ cols <- c("black", "coral", "cadetblue")[as.numeric(cond)]
 text(pcscores, col = cols)
 legend("topright", legend = c("Auditory", "Visual", "Auditory & Visual"), text.col = c("black", "coral", "cadetblue"))
 par(op)
-
 
 fmean <- func.mean(ftension1)
 pc1plus <- fmean$data[1,] + 3*fpca$rotation$data[1,]

@@ -71,8 +71,7 @@ clusmemb2[c("comptime", "suicide", "weightgain"), ]
 
 plot(fitLN3, main = "Latent Class Network", cluster.col = c("coral", "cadetblue", "darkgoldenrod"), 
      pie = TRUE, labels = TRUE, label.cex = 0.8, label.col = "darkgray", vertex.cex = 1.5, what = "pmean", 
-     xlim = c(-7, 10), 
-     xlab = "Dimension 1", ylab = "Dimension 2")
+     xlim = c(-7, 10), xlab = "Dimension 1", ylab = "Dimension 2")
 
 plot(fitLN3, main = "Latent Class Network", cluster.col = c("coral", "cadetblue", "darkgoldenrod"), what = "density")
 

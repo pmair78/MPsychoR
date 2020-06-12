@@ -44,7 +44,7 @@ clusmemb <- as.factor(fitlca3$predclass)
 
 library("flexmix")
 data("zareki")
-set.seed(123)
+set.seed(333)
 zarflex <- stepFlexmix(~ 1, data = zareki, k = 1:4, nrep = 3, 
                        model = list(FLXMRmultinom(addit7 ~ .), 
                                     FLXMRmultinom(addit8 ~ .),
@@ -110,7 +110,7 @@ par(op)
 
 library("MPsychoR")
 data("KoreanSpeech")
-set.seed(123)
+set.seed(121)
 koreamix <- flexmix(frequency ~ attitude|subject, k = 2, data = na.omit(KoreanSpeech))
 table(koreamix@cluster)
 parameters(koreamix) 
@@ -125,7 +125,7 @@ brain <- brain[brain$medFPQ > 5e-3,] ## exclude outliers
 trellis.par.set(regions = list(col = colorRampPalette(c('cadetblue4', 'white', 'coral4'))))
 levelplot(log(medFPQ) ~ Y*X, data = brain)     
 
-set.seed(123)
+set.seed(121)
 fitgammix <- flexmix(log(medFPQ) ~ s(Y, X, k = 30), model = FLXMRmgcv(), k = 3, 
                      data = brain, control = list(tolerance = 10^-3))
 table(clusters(fitgammix))

@@ -100,19 +100,20 @@ library("multiway")
 SDOarc <- ncenter(SDOar, mode = 1)
 dimnames(SDOarc) <- dnames
 
-set.seed(111)
+set.seed(66)
 sdopara <- parafac(SDOarc, nfac = 2)
 str(sdopara[1:4])
 dimnames(sdopara$B) <- list(dnames[[2]], paste0("Comp.", 1:2))
 round(sdopara$B, 3)  ## loadings
 
 op <- par(mfrow = c(1,2))
-plot(sdopara$A, xlab = "Dimension 1", ylab = "Dimension 2", main = "SDO Parafac Biplot", col = "gray", cex = 0.5, asp = 1)
+plot(sdopara$A, xlab = "Dimension 1", ylab = "Dimension 2", main = "SDO Parafac Biplot", col = "gray", 
+     cex = 0.5, asp = 1, ylim = c(-4, 2))
 abline(h = 0, v = 0, lty = 2, col = "gray")
 arrows(0, 0, sdopara$B[,1], sdopara$B[,2], length = 0.10)
 text(sdopara$B, labels = dnames[[2]], cex = 0.8, pos = 3)
 plot(1:5, sdopara$C[,1], type = "l", xaxt = "n", ylab = "Component Scores", main = "Parafac Occasion Components",
-     xlab = "Time", col = "cadetblue", lwd = 2, ylim = c(0.5, 0.8))
+     xlab = "Time", col = "cadetblue", lwd = 2, ylim = c(-0.5, -0.8))
 axis(1, 1:5, labels = 1996:2000)
 lines(1:5, sdopara$C[, 2], type = "l", col = "coral", lwd = 2)
 legend("bottomright", legend = c("Component 1", "Component 2"), lty = 1, col = c("cadetblue", "coral"))
@@ -152,7 +153,9 @@ data(eeghead)
 shade3d(eeghead)
 eeghead$material$color <- rep(1,length(eeghead$material$color))
 wire3d(eeghead)
-eegcap(elecvec, col.point = "coral4", cex.point = 0.3, col.label = "coral4", head = FALSE, add = TRUE)
+eegcap(elecvec, type = "3d", col.point = "coral4", cex.point = 0.3, col.label = "coral4", 
+       head = FALSE, add = TRUE)
+
 eegcap(elecvec, type = "2d", col.point = "gray", col.label = "black", cex.label = 0.8, cex.point = 4)
 
 library("plyr")

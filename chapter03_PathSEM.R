@@ -118,7 +118,7 @@ data("duncan")
 model_shape <- ' 
    inter =~ 1*CIG_T1 + 1*CIG_T2 + 1*CIG_T3 + 1*CIG_T4
    shape =~ 0*CIG_T1 + 1*CIG_T2 + CIG_T3 + CIG_T4'
-fitCig1 <- growth(model_shape, data = duncan, estimator = "WLS")
+fitCig1 <- growth(model_shape, data = duncan, estimator = "WLS", optim.method = "BFGS")
 
 semPaths(fitCig1, what = "std", edge.label.cex = 0.7, esize = 1, edge.color = 1, sizeMan = 6, asize = 2.5, 
          intercepts = FALSE, rotation = 4, mar = c(3, 5, 3.5, 5), fade = FALSE)

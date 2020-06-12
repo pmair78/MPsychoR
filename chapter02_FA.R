@@ -154,8 +154,14 @@ parameterEstimates(fitMot4)[16:17,]
 library("semTools")
 data("Bergh")
 GP_model <- 'GP =~ EP + HP + DP + SP'
-minvfit <- measurementInvariance(GP_model, data = Bergh, group = "gender", estimator = "MLR")
-summary(minvfit$fit.configural, standardized = TRUE, fit.measures = TRUE)
+minvfit1 <- measEq.syntax(GP_model, data = Bergh, group = "gender", return.fit = TRUE)
+minvfit2 <- measEq.syntax(GP_model, data = Bergh, group = "gender", 
+                          group.equal = c("loadings"), return.fit = TRUE)
+minvfit3 <- measEq.syntax(GP_model, data = Bergh, group = "gender", 
+                          group.equal = c("loadings", "intercepts"), return.fit = TRUE)
+minvfit4 <- measEq.syntax(GP_model, data = Bergh, group = "gender", 
+                          group.equal = c("loadings", "intercepts", "means"), return.fit = TRUE)
+anova(minvfit1, minvfit2, minvfit3, minvfit4)
 
 GP_model <- 'GP =~ c(v1,v1)*EP + c(v2,v2)*HP + c(v3,v3)*DP + SP'
 fitBase <- lavaan::cfa(GP_model, data = Bergh, group = "gender", estimator = "MLR")
@@ -258,8 +264,7 @@ library("MPsychoR")
 data("Bergh")
 GP_model <- 'GP =~ EP + HP + DP + SP'
 set.seed(123)
-fitBCFA <- bcfa(GP_model, data = Bergh, burnin = 2000, sample = 10000, n.chains = 2, 
-                jagcontrol = list(method = "rjparallel"))
+fitBCFA <- bcfa(GP_model, data = Bergh, burnin = 2000, sample = 10000, n.chains = 2)
 
 plot(fitBCFA, pars = 1:2, plot.type = "trace")
 plot(fitBCFA, pars = 1:2, plot.type = "autocorr")

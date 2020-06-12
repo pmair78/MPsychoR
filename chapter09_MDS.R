@@ -138,13 +138,12 @@ par(op)
 data("NeuralActivity")
 fitNeuro <- indscal(NeuralActivity[1:10], type = "interval", itmax = 5000)
 
-library("SDMTools")
+library("plotfunctions")
 data("NeuralScales")
 cols <- cut(NeuralScales$Social, 5, labels = FALSE)
 colpal <- rev(sequential_hcl(5))
 pal <- palette(colpal)
 plot(fitNeuro, col = cols, label.conf = list(col = cols), main = "Neural Activity Space")
-legend.gradient(cbind(x = c(0.85,0.95,0.95,0.85), y = c(-0.9,-0.9,-0.5,-0.5)), 
-                limits = c("low", "high"), cols = colpal, title = "Social", cex = 0.8)
+gradientLegend(valRange = c(1,5), color = colpal, n.seg = 1:5, dec = 0, inside = TRUE, pos.num = 4)
 palette(pal)
 

@@ -4,16 +4,16 @@
 library("fmri")
 scanS1R1 <- read.NIFTI("s01_r01_FUNC.nii") 
 summary(scanS1R1)
-imageS1R1 <- fmri::extract.data(scanS1R1)
+imageS1R1 <- fmri::extractData(scanS1R1)
 
 imdim <- dim(imageS1R1)
 rm(scanS1R1)
 imageS1R1[50, 50, 10, 100]
 
 mask <- read.ANALYZE("globalmask.img")
-mask <- extract.data(mask)[,,,1]
+mask <- fmri::extractData(mask)[,,,1]
 imageS1R1r <- read.NIFTI("wFUN1.nii")
-imageS1R1 <- fmri::extract.data(imageS1R1r)
+imageS1R1 <- fmri::extractData(imageS1R1r)
 dim(imageS1R1)
 
 imageS1R1T1 <- imageS1R1[,,,1]
@@ -23,16 +23,16 @@ sigma <- 2
 unsmooth <- GaussSmoothArray(imageS1R1T1, sigma = diag(0, 3), mask = mask)   
 smooth <- GaussSmoothArray(imageS1R1T1, sigma = diag(sigma^2, 3), mask = mask)  
 
-library("ggBrain")
+library("ggBrain")   ## devtools::install_github('aaronjfisher/ggBrain',build_vignettes=TRUE)
 plotsmooth <- ggBrain(brains = list(unsmooth, smooth), mask = mask, mar = c(3,3), mar_ind = c(50,50), 
                       brain_ind = c(1,2), col_ind = c("Unsmoothed", "Smoothed"), type = 'signed')
 plotsmooth
 
-library("RNiftyReg")
-template <- readNifti(system.file("MNI152_T1_2mm_brain.nii.gz", package = "brainR"))
+library("RNiftyReg")  
+template <- RNiftyRef::readNifti(system.file("MNI152_T1_2mm_brain.nii.gz", package = "brainR"))
 dim(template)
 
-imageS1R1a <- readNifti("wFUN1.nii")[,,,10]
+imageS1R1a <- RNiftyReg::readNifti("wFUN1.nii")[,,,10]
 dim(imageS1R1a)
 
 template1 <- niftyreg(source = template, target = imageS1R1a, scope = "affine")$image 
@@ -41,7 +41,8 @@ dim(template1)
 
 library("brainR")
 contour3d(template1, level = 3500, alpha = 0.1, draw = TRUE)
-contour3d(imageS1R1a, level = c(1000, 2000), add = TRUE, alpha = c(0.8, 0.9), color = c("yellow", "red"), mask = mask)
+contour3d(imageS1R1a, level = c(1000, 2000), add = TRUE, alpha = c(0.8, 0.9), 
+          color = c("yellow", "red"), mask = mask)
 
 voxelts <- imageS1R1[50, 50, 10,]
 plot(1:length(voxelts), voxelts, type = "l", main = "Voxel Time Series", ylab = "BOLD Intensity", xlab = "Time")
@@ -103,9 +104,23 @@ X <- fmri.design(xt, order = 2)
 head(X)
 dim(X)
 
+library("fields")
+col5 <- colorRampPalette(c('cadetblue4', 'white', 'coral4'))
+collev <- 21
+maxval <- max(abs(X))
+colbreak <- seq(-maxval, maxval, length.out = collev + 1)
+dev.new()
+op <- par(mar = c(5,5,5,7))
+image(t(X), axes = FALSE, main = "Simple fMRI Design Matrix", xlab = "Contrasts", 
+      col = col5(n = collev), breaks = colbreak)
+axis(1, at = c(0, 0.33, 0.66, 1), labels = c("E(BOLD)", "Intercept", "Linear", "Quadratic"))
+box()
+image.plot(t(X), legend.only = TRUE , col = col5(n = collev), breaks = colbreak)
+par(op)
+
 imageS1R1 <- read.NIFTI("wFUN1.nii")
-dim(extract.data(imageS1R1))
-spmS1R1 <- fmri.lm(imageS1R1, X)
+dim(fmri::extractData(imageS1R1))
+spmS1R1 <- fmri.lm(imageS1R1, X, verbose = TRUE)
 dim(spmS1R1$beta) 
 
 spmsmoothS1R1 <- fmri.smooth(spmS1R1)
@@ -164,16 +179,15 @@ X3 <- X[1:(nt*nruns), ]
 X3 <- X3[, colSums(X3) != 0]
 
 mask <- read.ANALYZE("globalmask.img")
-mask <- extract.data(mask)[,,,1]
+mask <- fmri::extractData(mask)[,,,1]
 
 scanfiles <- paste0("wFUN", 1:nruns, ".nii")
 imageS1 <- array(0, dim = c(dim(mask), nt*nruns))
 sigma <- 2
 for (i in 1:nruns) {
   scanRi <- read.NIFTI(scanfiles[i])
-  scanRi <- extract.data(scanRi)
-  scanRi <- GaussSmoothArray(scanRi, sigma = diag(sigma^2,3),
-                             mask = mask)
+  scanRi <- fmri::extractData(scanRi)
+  scanRi <- GaussSmoothArray(scanRi, sigma = diag(sigma^2,3), mask = mask)
   start4d <- (i-1)*nt + 1
   end4d <- i*nt
   imageS1[,,,start4d:end4d] <- scanRi
@@ -193,7 +207,7 @@ dim(spm3_2D)
 
 ## ----- multiple comparisons in fMRI
 mask <- read.ANALYZE("globalmask.img")
-mask <- extract.data(mask)[,,,1]
+mask <- fmri::extractData(mask)[,,,1]
 imgdim <- dim(mask)
 n <- 20
 sigma <- 2
@@ -201,13 +215,13 @@ files <- paste0("con_s", sprintf("%02d", 1:20), "_0002")
 spmC1 <- numeric()
 for (i in 1:n) {
   spmi <- read.ANALYZE(files[i])
-  spmi <- extract.data(spmi)[,,,1]
+  spmi <- extractData(spmi)[,,,1]
   spmiSmooth <- GaussSmoothArray(spmi, sigma = diag(sigma^2,3), mask = mask)
   spmiSmooth <- spmiSmooth[mask != 0]
   spmC1 <- rbind(spmC1, spmiSmooth)
 }
 
-library("genefilter")
+library("genefilter")     ## BiocManager::install("genefilter")
 fitT <- colttests(spmC1, gl(1, nrow(spmC1)))
 sum(fitT$p.value <= 0.05)
 
@@ -285,7 +299,7 @@ str(tsICAs)
 library("ggplot2")
 library("cowplot")
 imgICAS1 <- read.NIFTI("imageS1_ICAs.nii")
-imgICAS1 <- extract.data(imgICAS1)[,,,1]
+imgICAS1 <- extractData(imgICAS1)[,,,1]
 tsdf <- data.frame(time = 1:486, IC1 = tsICAs[,1])
 bp <- ggBrain(brains = imgICAS1, mask = mask, mar = 3, mar_ind = 40, type = 'signed') + theme_gray()
 tsp <- ggplot(tsdf, aes(time, IC1)) + geom_line() + theme_gray()

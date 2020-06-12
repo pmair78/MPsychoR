@@ -222,5 +222,5 @@ BSSS.model <- 'ES =~ Explore + Trip
                TAS =~ Frightning + Bungee
                DIS =~ Party + Illegal
                Risk =~ ES + BS + TAS + DIS'
-cfabs <- cfa(BSSS.model, data = BSSSnew, estimator = "WLS")
-
+cfabs <- cfa(BSSS.model, data = BSSSnew, estimator = "WLS", optim.method = "BFGS", check.gradient = FALSE)
+round(fitMeasures(cfabs)["rmsea"], 3)
